@@ -1,31 +1,300 @@
 <!doctype html>
 <html lang="hi">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Café Document Upload</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Shad Sheikh Digital | Document Upload</title>
+<meta name="description" content="Shad Sheikh Digital - Digital Document & Online Services">
+
 <style>
-body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;color:#222}
-.wrap{max-width:620px;margin:35px auto;padding:18px}.card{background:white;border-radius:18px;padding:24px;box-shadow:0 5px 25px #0001}
-h1{margin-top:0}.muted{color:#666}.btn{display:block;width:100%;padding:14px;border:0;border-radius:10px;background:#111;color:#fff;font-size:16px;cursor:pointer}
-input{width:100%;box-sizing:border-box;padding:13px;margin:7px 0 14px;border:1px solid #ddd;border-radius:9px}
-.success{padding:14px;background:#e9f8ed;border-radius:10px;display:none;margin-top:15px}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#eef6ff,#ffffff);
+  color:#172033;
+}
+
+.wrap{
+  max-width:850px;
+  margin:auto;
+  padding:25px 15px 40px;
+}
+
+.header{
+  text-align:center;
+  padding:30px 10px;
+}
+
+.logo{
+  width:90px;
+  height:90px;
+  margin:auto;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#1264d8,#20a4f3);
+  color:white;
+  font-size:30px;
+  font-weight:bold;
+}
+
+h1{
+  margin:16px 0 8px;
+  font-size:32px;
+}
+
+.subtitle{
+  color:#667085;
+  font-size:16px;
+}
+
+.owner{
+  margin-top:10px;
+  font-weight:bold;
+  color:#1264d8;
+}
+
+.buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-top:25px;
+}
+
+.btn{
+  display:block;
+  padding:15px;
+  border:0;
+  border-radius:12px;
+  text-align:center;
+  text-decoration:none;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.public{
+  background:#1264d8;
+  color:white;
+}
+
+.admin{
+  background:#172033;
+  color:white;
+}
+
+.card{
+  background:white;
+  border-radius:20px;
+  padding:25px;
+  box-shadow:0 8px 30px #00000012;
+}
+
+label{
+  display:block;
+  margin:15px 0 7px;
+  font-weight:bold;
+}
+
+input{
+  width:100%;
+  padding:13px;
+  border:1px solid #d0d5dd;
+  border-radius:10px;
+  font-size:15px;
+}
+
+.upload{
+  width:100%;
+  margin-top:18px;
+  background:#1264d8;
+  color:white;
+}
+
+.note{
+  text-align:center;
+  color:#667085;
+  font-size:13px;
+  margin-top:12px;
+}
+
+#msg{
+  text-align:center;
+  margin-top:15px;
+  font-weight:bold;
+}
+
+@media(max-width:600px){
+  h1{font-size:26px}
+  .buttons{grid-template-columns:1fr}
+}
 </style>
 </head>
-<body><div class="wrap"><div class="card">
-<h1>📄 Café Document Upload</h1>
-<p class="muted">Print निकलवाने के लिए अपनी PDF या photo यहाँ upload करें.</p>
-<form id="form">
-<label>आपका नाम</label><input name="name" required maxlength="80" placeholder="जैसे Rahul Kumar">
-<label>Mobile के आखिरी 4 अंक</label><input name="last4" inputmode="numeric" maxlength="4" required placeholder="1234">
-<label>Document (अधिकतम 10 files, प्रत्येक 20 MB)</label><input name="documents" type="file" multiple required accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx">
-<button class="btn">Upload करें</button>
-</form><div id="msg" class="success"></div>
-</div></div>
+
+<body>
+
+<div class="wrap">
+
+  <div class="header">
+
+    <div class="logo">SS</div>
+
+    <h1>Shad Sheikh Digital</h1>
+
+    <div class="subtitle">
+      Digital Document & Online Services
+    </div>
+
+    <div class="owner">
+      Owner: Shad Sheikh
+    </div>
+
+    <div class="buttons">
+
+      <a class="btn public" href="#upload">
+        📄 Public Document
+      </a>
+
+      <a class="btn admin" href="/admin.html">
+        🔐 Shad Sheikh Admin
+      </a>
+
+    </div>
+
+  </div>
+
+  <div class="card" id="upload">
+
+    <h2>📄 Public Document Upload</h2>
+
+    <p>
+      Apna document upload karne ke liye neeche details bharen.
+    </p>
+
+    <form id="form">
+
+      <label>Name</label>
+
+      <input
+        id="name"
+        type="text"
+        placeholder="Apna naam likhen"
+        required
+      >
+
+      <label>Mobile ke last 4 digits</label>
+
+      <input
+        id="mobileLast4"
+        type="text"
+        maxlength="4"
+        inputmode="numeric"
+        placeholder="Example: 1234"
+        required
+      >
+
+      <label>Document select karein</label>
+
+      <input
+        id="files"
+        type="file"
+        multiple
+        accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
+        required
+      >
+
+      <button class="btn upload" type="submit">
+        📤 Upload Document
+      </button>
+
+    </form>
+
+    <div class="note">
+      Maximum 20 MB per file • PDF, JPG, PNG, WEBP, DOC, DOCX
+    </div>
+
+    <div id="msg"></div>
+
+  </div>
+
+</div>
+
 <script>
-form.onsubmit=async e=>{
- e.preventDefault(); const btn=form.querySelector("button"); btn.disabled=true; btn.textContent="Uploading...";
- const r=await fetch("/api/upload",{method:"POST",body:new FormData(form)}); const d=await r.json();
- msg.style.display="block"; msg.textContent=r.ok?"✅ Document upload हो गया। अब counter पर अपना नाम बताइए।":"❌ "+(d.error||"Upload failed");
- if(r.ok) form.reset(); btn.disabled=false; btn.textContent="Upload करें";
-};
-</script></body></html>
+
+const form = document.getElementById("form");
+const msg = document.getElementById("msg");
+
+form.addEventListener("submit", async function(e){
+
+  e.preventDefault();
+
+  const name =
+    document.getElementById("name").value.trim();
+
+  const mobileLast4 =
+    document.getElementById("mobileLast4").value.trim();
+
+  const files =
+    document.getElementById("files").files;
+
+  if(!/^\d{4}$/.test(mobileLast4)){
+    msg.textContent =
+      "❌ Mobile ke sirf last 4 digits daalein.";
+    return;
+  }
+
+  if(!files.length){
+    msg.textContent =
+      "❌ Document select karein.";
+    return;
+  }
+
+  const fd = new FormData();
+
+  fd.append("name", name);
+  fd.append("mobileLast4", mobileLast4);
+
+  for(const file of files){
+    fd.append("files", file);
+  }
+
+  msg.textContent =
+    "⏳ Upload ho raha hai...";
+
+  try{
+
+    const r = await fetch("/upload",{
+      method:"POST",
+      body:fd
+    });
+
+    const data = await r.json();
+
+    if(!r.ok){
+      msg.textContent =
+        "❌ " + (data.error || "Upload failed");
+      return;
+    }
+
+    msg.textContent =
+      "✅ Document successfully upload ho gaya.";
+
+    form.reset();
+
+  }catch(error){
+
+    msg.textContent =
+      "❌ Server se connection nahi ho paaya.";
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
