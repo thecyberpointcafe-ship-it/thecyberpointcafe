@@ -4,122 +4,112 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Shad Sheikh Digital | Document Upload</title>
-<meta name="description" content="Shad Sheikh Digital - Digital Document & Online Services">
-<meta name="keywords" content="Shad Sheikh Digital, Shad Sheikh Upload, Shad Sheikh Document">
+<title>Shad Sheikh Admin</title>
 
 <style>
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:Arial,sans-serif;
-  background:linear-gradient(135deg,#eef6ff,#ffffff);
+  background:#f4f7fb;
   color:#172033;
 }
+
 .wrap{
-  max-width:850px;
-  margin:0 auto;
+  max-width:1000px;
+  margin:auto;
   padding:25px 15px 40px;
 }
-.card{
-  background:#fff;
-  border-radius:22px;
-  padding:25px;
-  margin:18px 0;
-  box-shadow:0 8px 30px #00000012;
-}
-.header{
-  text-align:center;
-  padding:30px 15px 20px;
-}
-.logo{
-  width:90px;
-  height:90px;
-  margin:auto;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,#1264d8,#20a4f3);
-  color:white;
-  font-size:30px;
-  font-weight:bold;
-  box-shadow:0 8px 20px #1264d833;
-}
+
 h1{
-  margin:16px 0 8px;
-  font-size:32px;
-}
-.subtitle{
-  color:#667085;
-  font-size:16px;
-}
-.owner{
-  margin-top:10px;
-  font-weight:bold;
-  color:#1264d8;
-}
-.buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-  margin-top:25px;
-}
-.btn{
-  display:block;
-  padding:15px;
-  border:0;
-  border-radius:12px;
   text-align:center;
-  text-decoration:none;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
+  margin-bottom:25px;
 }
-.public{
-  background:#1264d8;
-  color:white;
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:20px;
+  margin:15px 0;
+  box-shadow:0 5px 25px #00000012;
 }
-.admin{
-  background:#172033;
-  color:white;
+
+.login{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
 }
-label{
-  display:block;
-  margin:15px 0 7px;
-  font-weight:bold;
-}
+
 input{
-  width:100%;
+  flex:1;
+  min-width:220px;
   padding:13px;
-  border:1px solid #d0d5dd;
+  border:1px solid #ccd3df;
   border-radius:10px;
   font-size:15px;
 }
-input[type=file]{
-  background:#f8fafc;
+
+button,a{
+  padding:12px 16px;
+  border:0;
+  border-radius:10px;
+  cursor:pointer;
+  text-decoration:none;
+  font-weight:bold;
 }
-.upload{
-  width:100%;
-  margin-top:18px;
+
+button{
   background:#1264d8;
   color:white;
 }
-.note{
-  text-align:center;
-  color:#667085;
-  font-size:13px;
-  margin-top:12px;
+
+.home{
+  display:inline-block;
+  background:#172033;
+  color:white;
+  margin-bottom:15px;
 }
-#msg{
-  text-align:center;
-  margin-top:15px;
+
+.delete{
+  background:#d33;
+  color:white;
+}
+
+.download{
+  background:#1264d8;
+  color:white;
+  display:inline-block;
+  margin:5px 5px 5px 0;
+}
+
+.status{
+  margin-top:12px;
   font-weight:bold;
 }
+
+.file{
+  background:#f5f7fa;
+  padding:12px;
+  border-radius:10px;
+  margin:8px 0;
+}
+
+.small{
+  color:#667085;
+  font-size:14px;
+}
+
 @media(max-width:600px){
-  h1{font-size:26px}
-  .buttons{grid-template-columns:1fr}
-  .card{padding:20px}
+  .login{
+    display:block;
+  }
+
+  .login input,
+  .login button{
+    width:100%;
+    margin-bottom:10px;
+  }
 }
 </style>
 </head>
@@ -128,141 +118,244 @@ input[type=file]{
 
 <div class="wrap">
 
-  <div class="header">
-    <div class="logo">SS</div>
+<a class="home" href="/">← Public Website</a>
 
-    <h1>Shad Sheikh Digital</h1>
+<h1>🔐 Shad Sheikh Admin</h1>
 
-    <div class="subtitle">
-      Digital Document & Online Services
-    </div>
+<div class="card">
 
-    <div class="owner">
-      Owner: Shad Sheikh
-    </div>
+  <div class="login">
 
-    <div class="buttons">
-      <a class="btn public" href="#upload">
-        📄 Public Document
-      </a>
+    <input
+      id="key"
+      type="password"
+      placeholder="Admin password"
+    >
 
-      <a class="btn admin" href="/admin.html">
-        🔐 Shad Sheikh Admin
-      </a>
-    </div>
+    <button onclick="loadJobs()">
+      Login / Refresh
+    </button>
+
   </div>
 
-  <div class="card" id="upload">
-
-    <h2>📄 Public Document Upload</h2>
-
-    <p>
-      Apna document upload karne ke liye neeche details bharen.
-    </p>
-
-    <form id="form">
-
-      <label>Name</label>
-      <input
-        id="name"
-        type="text"
-        placeholder="Apna naam likhen"
-        required
-      >
-
-      <label>Mobile ke last 4 digits</label>
-      <input
-        id="mobileLast4"
-        type="text"
-        maxlength="4"
-        inputmode="numeric"
-        placeholder="Example: 1234"
-        required
-      >
-
-      <label>Document select karein</label>
-      <input
-        id="files"
-        type="file"
-        multiple
-        accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
-        required
-      >
-
-      <button class="btn upload" type="submit">
-        📤 Upload Document
-      </button>
-
-    </form>
-
-    <div class="note">
-      Maximum 20 MB per file • PDF, JPG, PNG, WEBP, DOC, DOCX
-    </div>
-
-    <div id="msg"></div>
-
+  <div id="status" class="status">
+    Password enter karke Login karein.
   </div>
 
 </div>
 
+<div id="jobs"></div>
+
+</div>
+
 <script>
-const form = document.getElementById("form");
-const msg = document.getElementById("msg");
 
-form.addEventListener("submit", async function(e){
+const keyInput = document.getElementById("key");
+const statusBox = document.getElementById("status");
+const jobsBox = document.getElementById("jobs");
 
-  e.preventDefault();
+keyInput.value = localStorage.getItem("cafeAdminKey") || "";
 
-  const name = document.getElementById("name").value.trim();
-  const mobileLast4 = document.getElementById("mobileLast4").value.trim();
-  const files = document.getElementById("files").files;
+async function loadJobs(){
 
-  if(!/^\d{4}$/.test(mobileLast4)){
-    msg.textContent = "❌ Mobile ke sirf last 4 digits daalein.";
+  const key = keyInput.value.trim();
+
+  if(!key){
+    statusBox.textContent = "❌ Password enter karein.";
     return;
   }
 
-  if(!files.length){
-    msg.textContent = "❌ Document select karein.";
-    return;
-  }
+  localStorage.setItem("cafeAdminKey", key);
 
-  const fd = new FormData();
-
-  fd.append("name", name);
-  fd.append("mobileLast4", mobileLast4);
-
-  for(const file of files){
-    fd.append("files", file);
-  }
-
-  msg.textContent = "⏳ Upload ho raha hai...";
+  statusBox.textContent = "⏳ Loading...";
 
   try{
 
-    const r = await fetch("/upload",{
-      method:"POST",
-      body:fd
+    const response = await fetch("/api/jobs",{
+      headers:{
+        "x-admin-key":key
+      }
     });
 
-    const data = await r.json();
+    if(!response.ok){
 
-    if(!r.ok){
-      msg.textContent = "❌ " + (data.error || "Upload failed");
+      statusBox.textContent =
+        "❌ Wrong admin password.";
+
+      jobsBox.innerHTML = "";
+
       return;
     }
 
-    msg.textContent = "✅ Document successfully upload ho gaya.";
+    const jobs = await response.json();
 
-    form.reset();
+    statusBox.textContent =
+      "✅ Admin connected";
+
+    jobsBox.innerHTML = "";
+
+    if(!jobs.length){
+
+      jobsBox.innerHTML =
+        '<div class="card">📭 अभी कोई uploaded document नहीं है.</div>';
+
+      return;
+    }
+
+    jobs.forEach(job => {
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const date =
+        new Date(job.createdAt).toLocaleString("en-IN");
+
+      let filesHTML = "";
+
+      job.files.forEach(file => {
+
+        filesHTML += `
+          <div class="file">
+            📄 ${escapeHTML(file.originalName)}
+            <br>
+            <a
+              class="download"
+              href="/api/file/${file.id}"
+              target="_blank"
+              onclick="downloadFile(event,'${file.id}')"
+            >
+              ⬇️ Download
+            </a>
+          </div>
+        `;
+
+      });
+
+      card.innerHTML = `
+
+        <h3>👤 ${escapeHTML(job.name)}</h3>
+
+        <div class="small">
+          Mobile last 4 digits: ${escapeHTML(job.last4)}
+        </div>
+
+        <div class="small">
+          Uploaded: ${date}
+        </div>
+
+        <hr>
+
+        ${filesHTML}
+
+        <button
+          class="delete"
+          onclick="deleteJob('${job.id}')"
+        >
+          🗑️ Delete
+        </button>
+
+      `;
+
+      jobsBox.appendChild(card);
+
+    });
 
   }catch(error){
 
-    msg.textContent = "❌ Server se connection nahi ho paaya.";
+    statusBox.textContent =
+      "❌ Server connection error.";
 
   }
 
-});
+}
+
+async function downloadFile(event,id){
+
+  event.preventDefault();
+
+  const key = keyInput.value.trim();
+
+  try{
+
+    const response = await fetch("/api/file/"+id,{
+      headers:{
+        "x-admin-key":key
+      }
+    });
+
+    if(!response.ok){
+      alert("File download नहीं हो पाया.");
+      return;
+    }
+
+    const blob = await response.blob();
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "";
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    URL.revokeObjectURL(url);
+
+  }catch(error){
+
+    alert("Download error.");
+
+  }
+
+}
+
+async function deleteJob(id){
+
+  if(!confirm("क्या यह पूरा document record delete करना है?")){
+    return;
+  }
+
+  const key = keyInput.value.trim();
+
+  try{
+
+    const response = await fetch("/api/job/"+id,{
+      method:"DELETE",
+      headers:{
+        "x-admin-key":key
+      }
+    });
+
+    if(!response.ok){
+
+      alert("Delete नहीं हुआ.");
+      return;
+
+    }
+
+    loadJobs();
+
+  }catch(error){
+
+    alert("Delete error.");
+
+  }
+
+}
+
+function escapeHTML(value){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
 </script>
 
 </body>
