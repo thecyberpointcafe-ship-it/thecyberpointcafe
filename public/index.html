@@ -218,76 +218,57 @@ input{
 </div>
 
 <script>
-
 const form = document.getElementById("form");
 const msg = document.getElementById("msg");
 
-form.addEventListener("submit", async function(e){
-
+form.addEventListener("submit", async function(e) {
   e.preventDefault();
 
-  const name =
-    document.getElementById("name").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const mobileLast4 = document.getElementById("mobileLast4").value.trim();
+  const files = document.getElementById("files").files;
 
-  const mobileLast4 =
-    document.getElementById("mobileLast4").value.trim();
-
-  const files =
-    document.getElementById("files").files;
-
-  if(!/^\d{4}$/.test(mobileLast4)){
-    msg.textContent =
-      "❌ Mobile ke sirf last 4 digits daalein.";
+  if (!/^\d{4}$/.test(mobileLast4)) {
+    msg.textContent = "❌ Mobile ke sirf last 4 digits daalein.";
     return;
   }
 
-  if(!files.length){
-    msg.textContent =
-      "❌ Document select karein.";
+  if (!files.length) {
+    msg.textContent = "❌ Document select karein.";
     return;
   }
 
   const fd = new FormData();
 
   fd.append("name", name);
-  fd.append("mobileLast4", mobileLast4);
+  fd.append("last4", mobileLast4);
 
-  for(const file of files){
-    fd.append("files", file);
+  for (const file of files) {
+    fd.append("documents", file);
   }
 
-  msg.textContent =
-    "⏳ Upload ho raha hai...";
+  msg.textContent = "⏳ Upload ho raha hai...";
 
-  try{
-
-    const r = await fetch("/upload",{
-      method:"POST",
-      body:fd
+  try {
+    const r = await fetch("/api/upload", {
+      method: "POST",
+      body: fd
     });
 
     const data = await r.json();
 
-    if(!r.ok){
-      msg.textContent =
-        "❌ " + (data.error || "Upload failed");
+    if (!r.ok) {
+      msg.textContent = "❌ " + (data.error || "Upload failed");
       return;
     }
 
-    msg.textContent =
-      "✅ Document successfully upload ho gaya.";
-
+    msg.textContent = "✅ Document successfully upload ho gaya.";
     form.reset();
 
-  }catch(error){
-
-    msg.textContent =
-      "❌ Server se connection nahi ho paaya.";
-
+  } catch (error) {
+    msg.textContent = "❌ Server se connection nahi ho paaya.";
   }
-
 });
-
 </script>
 
 </body>
