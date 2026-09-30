@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <meta name="google-site-verification" content="t4r2bEtLrgrWZTG7sAva4zlqm3hUoJzfeddefrIEYLQ">
 
-<title>Shad Sheikh Digital | Online Document & Digital Services</title>
+<title>Shad Sheikh Digital | Online Document Services</title>
 
-<meta name="description" content="Shad Sheikh Digital - Online document upload, printing and digital services. Upload your documents easily and securely.">
+<meta name="description" content="Shad Sheikh Digital - Easy online document upload and digital services.">
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -16,30 +20,27 @@
 body{
   margin:0;
   font-family:Arial,sans-serif;
-  background:linear-gradient(135deg,#eef6ff,#ffffff);
+  background:#f4f8ff;
   color:#172033;
 }
 
 .wrap{
-  max-width:850px;
+  max-width:650px;
   margin:auto;
-  padding:25px 15px 40px;
+  padding:18px 14px 35px;
 }
 
 .header{
   text-align:center;
-  padding:30px 10px;
+  padding:15px 5px 20px;
 }
 
 .logo{
-  width:90px;
-  height:90px;
+  width:75px;
+  height:75px;
   margin:auto;
   border-radius:50%;
   overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
 }
 
 .logo img{
@@ -50,36 +51,37 @@ body{
 }
 
 h1{
-  margin:16px 0 8px;
-  font-size:32px;
+  margin:12px 0 5px;
+  font-size:27px;
 }
 
 .subtitle{
   color:#667085;
-  font-size:16px;
+  font-size:14px;
 }
 
 .owner{
-  margin-top:10px;
+  margin-top:7px;
   font-weight:bold;
   color:#1264d8;
+  font-size:14px;
 }
 
 .buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-  margin-top:25px;
+  display:flex;
+  gap:10px;
+  margin-top:18px;
 }
 
 .btn{
+  flex:1;
   display:block;
-  padding:15px;
+  padding:13px 10px;
   border:0;
-  border-radius:12px;
+  border-radius:10px;
   text-align:center;
   text-decoration:none;
-  font-size:16px;
+  font-size:14px;
   font-weight:bold;
   cursor:pointer;
 }
@@ -96,56 +98,122 @@ h1{
 
 .card{
   background:white;
-  border-radius:20px;
-  padding:25px;
-  box-shadow:0 8px 30px #00000012;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 5px 20px #0000000d;
+}
+
+.card h2{
+  margin:0 0 7px;
+  font-size:21px;
+}
+
+.card p{
+  margin:0;
+  color:#667085;
+  font-size:14px;
 }
 
 .file-box{
-  margin-top:20px;
+  display:block;
+  width:100%;
+  margin-top:18px;
   padding:25px 15px;
   border:2px dashed #1264d8;
-  border-radius:15px;
+  border-radius:14px;
   text-align:center;
   background:#f8fbff;
+  cursor:pointer;
+  transition:.15s;
 }
 
-.file-box input{
-  width:100%;
-  font-size:15px;
+.file-box:active{
+  transform:scale(.99);
+  background:#eef6ff;
+}
+
+.file-box strong{
+  display:block;
+  font-size:17px;
+  color:#1264d8;
+}
+
+.file-box span{
+  display:block;
+  margin-top:7px;
+  color:#667085;
+  font-size:13px;
+}
+
+#files{
+  display:none;
 }
 
 .upload{
   width:100%;
-  margin-top:18px;
+  margin-top:12px;
   background:#1264d8;
   color:white;
+  font-size:16px;
+}
+
+.upload:disabled{
+  opacity:.6;
 }
 
 .note{
   text-align:center;
   color:#667085;
-  font-size:13px;
-  margin-top:12px;
+  font-size:12px;
+  margin-top:10px;
 }
 
 #msg{
   text-align:center;
-  margin-top:15px;
+  margin-top:13px;
   font-weight:bold;
+  font-size:14px;
+}
+
+#selected{
+  margin-top:10px;
+  padding:10px;
+  border-radius:9px;
+  background:#f2f5f9;
+  font-size:13px;
+  display:none;
+  word-break:break-word;
 }
 
 @media(max-width:600px){
 
+  .wrap{
+    padding:12px 12px 30px;
+  }
+
   h1{
-    font-size:26px;
+    font-size:24px;
   }
 
   .buttons{
-    grid-template-columns:1fr;
+    gap:8px;
+  }
+
+  .btn{
+    font-size:13px;
+    padding:12px 7px;
+  }
+
+  .card{
+    padding:16px;
+  }
+
+  .file-box{
+    padding:28px 10px;
   }
 
 }
+
 </style>
 
 </head>
@@ -173,52 +241,65 @@ h1{
     <div class="buttons">
 
       <a class="btn public" href="#upload">
-        📄 Public Document
+        📄 Document
       </a>
 
       <a class="btn admin" href="/admin.html">
-        🔐 Shad Sheikh Admin
+        🔐 Admin
       </a>
 
     </div>
 
   </div>
 
+
   <div class="card" id="upload">
 
-    <h2>📄 Document Upload</h2>
+    <h2>📄 Document Send</h2>
 
     <p>
-      Apna document select karke Send button dabayein.
+      Document select karein aur Send dabayein.
     </p>
+
 
     <form id="form">
 
-      <div class="file-box">
+      <label class="file-box" for="files">
 
-        <strong>📁 Document Select Karein</strong>
+        <strong>📁 Document Select</strong>
 
-        <br><br>
+        <span>
+          Yahan kahin bhi tap karke document select karein
+        </span>
 
         <input
           id="files"
           type="file"
           multiple
           accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
-          required
         >
 
-      </div>
+      </label>
 
-      <button class="btn upload" type="submit">
-        📤 Send Document
+
+      <div id="selected"></div>
+
+
+      <button
+        class="btn upload"
+        id="sendBtn"
+        type="submit"
+      >
+        📤 Send
       </button>
 
     </form>
 
+
     <div class="note">
-      Maximum 20 MB per file • PDF, JPG, PNG, WEBP, DOC, DOCX
+      PDF, JPG, PNG, WEBP, DOC, DOCX • Maximum 20 MB per file
     </div>
+
 
     <div id="msg"></div>
 
@@ -226,53 +307,207 @@ h1{
 
 </div>
 
+
 <script>
 
-const form = document.getElementById("form");
-const msg = document.getElementById("msg");
+const form =
+  document.getElementById("form");
 
-form.addEventListener("submit", async function(e){
+const filesInput =
+  document.getElementById("files");
 
-  e.preventDefault();
+const selected =
+  document.getElementById("selected");
 
-  const files = document.getElementById("files").files;
+const msg =
+  document.getElementById("msg");
+
+const sendBtn =
+  document.getElementById("sendBtn");
+
+
+/* FILE SELECT */
+
+filesInput.addEventListener("change",function(){
+
+  const files = this.files;
 
   if(!files.length){
-    msg.textContent = "❌ Document select karein.";
+
+    selected.style.display="none";
+    selected.textContent="";
+
     return;
   }
 
-  const fd = new FormData();
+  let text =
+    "📎 " +
+    files.length +
+    " document selected";
 
-  for(const file of files){
-    fd.append("documents", file);
+  if(files.length === 1){
+
+    text =
+      "📎 " +
+      files[0].name;
+
   }
 
-  msg.textContent = "⏳ Document send ho raha hai...";
+  selected.textContent = text;
 
-  try{
+  selected.style.display="block";
 
-    const r = await fetch("/api/upload",{
-      method:"POST",
-      body:fd
-    });
+});
 
-    const data = await r.json();
 
-    if(!r.ok){
-      msg.textContent = "❌ " + (data.error || "Upload failed");
+/* UPLOAD */
+
+form.addEventListener("submit",function(e){
+
+  e.preventDefault();
+
+  const files =
+    filesInput.files;
+
+  if(!files.length){
+
+    msg.textContent =
+      "❌ Pehle document select karein.";
+
+    return;
+  }
+
+
+  /* SIZE CHECK */
+
+  for(const file of files){
+
+    if(
+      file.size >
+      20 * 1024 * 1024
+    ){
+
+      msg.textContent =
+        "❌ " +
+        file.name +
+        " 20 MB se bada hai.";
+
       return;
     }
 
-    msg.textContent = "✅ Document successfully send ho gaya.";
+  }
 
-    form.reset();
 
-  }catch(error){
+  const fd =
+    new FormData();
 
-    msg.textContent = "❌ Server se connection nahi ho paaya.";
+
+  for(const file of files){
+
+    fd.append(
+      "documents",
+      file
+    );
 
   }
+
+
+  sendBtn.disabled=true;
+
+  msg.textContent =
+    "⏳ Document send ho raha hai...";
+
+
+  const xhr =
+    new XMLHttpRequest();
+
+
+  xhr.open(
+    "POST",
+    "/api/upload"
+  );
+
+
+  /* UPLOAD PROGRESS */
+
+  xhr.upload.onprogress =
+    function(e){
+
+      if(e.lengthComputable){
+
+        const percent =
+          Math.round(
+            (e.loaded / e.total) * 100
+          );
+
+        msg.textContent =
+          "⏳ Sending... " +
+          percent +
+          "%";
+
+      }
+
+    };
+
+
+  xhr.onload =
+    function(){
+
+      sendBtn.disabled=false;
+
+      try{
+
+        const data =
+          JSON.parse(xhr.responseText);
+
+
+        if(
+          xhr.status >= 200 &&
+          xhr.status < 300
+        ){
+
+          msg.textContent =
+            "✅ Document successfully send ho gaya.";
+
+          form.reset();
+
+          selected.style.display="none";
+
+          selected.textContent="";
+
+        }else{
+
+          msg.textContent =
+            "❌ " +
+            (
+              data.error ||
+              "Upload failed"
+            );
+
+        }
+
+      }catch(error){
+
+        msg.textContent =
+          "❌ Upload failed.";
+
+      }
+
+    };
+
+
+  xhr.onerror =
+    function(){
+
+      sendBtn.disabled=false;
+
+      msg.textContent =
+        "❌ Server se connection nahi ho paaya.";
+
+    };
+
+
+  xhr.send(fd);
 
 });
 
