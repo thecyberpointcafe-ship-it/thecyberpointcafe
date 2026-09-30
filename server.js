@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+
 const ADMIN_KEY =
   process.env.ADMIN_KEY || "change-this-admin-key";
 
@@ -18,7 +19,7 @@ const DATA_FILE =
 
 
 /* =========================
-   FOLDERS / DATA
+   FOLDERS
 ========================= */
 
 fs.mkdirSync(UPLOAD_DIR, {
@@ -31,75 +32,82 @@ if (!fs.existsSync(DATA_FILE)) {
 
 
 /* =========================
-   FILE UPLOAD
+   MULTER
 ========================= */
 
-const storage = multer.diskStorage({
+const storage =
+  multer.diskStorage({
 
-  destination: (_, __, cb) => {
-    cb(null, UPLOAD_DIR);
-  },
+    destination: (_, __, cb) => {
+      cb(null, UPLOAD_DIR);
+    },
 
-  filename: (_, file, cb) => {
+    filename: (_, file, cb) => {
 
-    const ext =
-      path.extname(file.originalname)
-      .toLowerCase();
+      const ext =
+        path.extname(
+          file.originalname
+        ).toLowerCase();
 
-    cb(
-      null,
-      crypto.randomUUID() + ext
-    );
-  }
-
-});
-
-
-const upload = multer({
-
-  storage,
-
-  limits: {
-    fileSize: 20 * 1024 * 1024,
-    files: 10
-  },
-
-  fileFilter: (_, file, cb) => {
-
-    const allowed = [
-      ".pdf",
-      ".jpg",
-      ".jpeg",
-      ".png",
-      ".webp",
-      ".doc",
-      ".docx"
-    ];
-
-    const ext =
-      path.extname(file.originalname)
-      .toLowerCase();
-
-    if (allowed.includes(ext)) {
-      cb(null, true);
-    } else {
       cb(
-        new Error(
-          "This file type is not allowed."
-        )
+        null,
+        crypto.randomUUID() + ext
       );
+
     }
 
-  }
+  });
 
-});
+
+const upload =
+  multer({
+
+    storage,
+
+    limits: {
+      fileSize: 20 * 1024 * 1024,
+      files: 10
+    },
+
+    fileFilter: (_, file, cb) => {
+
+      const allowed = [
+        ".pdf",
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".webp",
+        ".doc",
+        ".docx"
+      ];
+
+      const ext =
+        path.extname(
+          file.originalname
+        ).toLowerCase();
+
+      if (allowed.includes(ext)) {
+        cb(null, true);
+      } else {
+        cb(
+          new Error(
+            "This file type is not allowed."
+          )
+        );
+      }
+
+    }
+
+  });
 
 
 /* =========================
    MIDDLEWARE
 ========================= */
 
-app.use(express.json());
+app.use(
+  express.json()
+);
 
 app.use(
   express.urlencoded({
@@ -109,13 +117,16 @@ app.use(
 
 app.use(
   express.static(
-    path.join(__dirname, "public")
+    path.join(
+      __dirname,
+      "public"
+    )
   )
 );
 
 
 /* =========================
-   DATA FUNCTIONS
+   DATA
 ========================= */
 
 function readData() {
@@ -156,7 +167,11 @@ function writeData(items) {
    ADMIN SECURITY
 ========================= */
 
-function admin(req, res, next) {
+function admin(
+  req,
+  res,
+  next
+) {
 
   const key =
     req.headers["x-admin-key"] ||
@@ -165,9 +180,11 @@ function admin(req, res, next) {
 
   if (key !== ADMIN_KEY) {
 
-    return res.status(401).json({
-      error: "Unauthorized"
-    });
+    return res
+      .status(401)
+      .json({
+        error: "Unauthorized"
+      });
 
   }
 
@@ -195,10 +212,12 @@ app.post(
       !req.files.length
     ) {
 
-      return res.status(400).json({
-        error:
-          "At least one document is required."
-      });
+      return res
+        .status(400)
+        .json({
+          error:
+            "At least one document is required."
+        });
 
     }
 
@@ -219,21 +238,23 @@ app.post(
         new Date().toISOString(),
 
       files:
-        req.files.map(file => ({
+        req.files.map(
+          file => ({
 
-          id:
-            crypto.randomUUID(),
+            id:
+              crypto.randomUUID(),
 
-          originalName:
-            file.originalname,
+            originalName:
+              file.originalname,
 
-          storedName:
-            file.filename,
+            storedName:
+              file.filename,
 
-          size:
-            file.size
+            size:
+              file.size
 
-        }))
+          })
+        )
 
     };
 
@@ -259,7 +280,7 @@ app.post(
 
 
 /* =========================
-   ADMIN DOCUMENT LIST
+   ADMIN JOBS
 ========================= */
 
 app.get(
@@ -276,7 +297,7 @@ app.get(
 
 
 /* =========================
-   FILE PREVIEW / OPEN
+   FILE OPEN / PREVIEW
 ========================= */
 
 app.get(
@@ -288,7 +309,9 @@ app.get(
       readData();
 
 
-    for (const job of jobs) {
+    for (
+      const job of jobs
+    ) {
 
       const file =
         job.files.find(
@@ -311,12 +334,16 @@ app.get(
 
 
       if (
-        !fs.existsSync(filePath)
+        !fs.existsSync(
+          filePath
+        )
       ) {
 
         return res
           .status(404)
-          .send("File not found");
+          .send(
+            "File not found"
+          );
 
       }
 
@@ -387,14 +414,16 @@ app.get(
 
     res
       .status(404)
-      .send("File not found");
+      .send(
+        "File not found"
+      );
 
   }
 );
 
 
 /* =========================
-   DELETE DOCUMENT
+   DELETE
 ========================= */
 
 app.delete(
@@ -416,9 +445,11 @@ app.delete(
 
     if (!job) {
 
-      return res.status(404).json({
-        error: "Not found"
-      });
+      return res
+        .status(404)
+        .json({
+          error: "Not found"
+        });
 
     }
 
@@ -435,7 +466,9 @@ app.delete(
 
 
       if (
-        fs.existsSync(filePath)
+        fs.existsSync(
+          filePath
+        )
       ) {
 
         fs.unlinkSync(
@@ -481,7 +514,7 @@ app.get(
 
 
 /* =========================
-   ERROR HANDLER
+   ERROR
 ========================= */
 
 app.use(
@@ -489,30 +522,36 @@ app.use(
 
     console.error(err);
 
+
     if (
-      err instanceof multer.MulterError
+      err instanceof
+      multer.MulterError
     ) {
 
-      return res.status(400).json({
-        error:
-          err.message
-      });
+      return res
+        .status(400)
+        .json({
+          error:
+            err.message
+        });
 
     }
 
 
-    res.status(400).json({
-      error:
-        err.message ||
-        "Upload failed"
-    });
+    res
+      .status(400)
+      .json({
+        error:
+          err.message ||
+          "Upload failed"
+      });
 
   }
 );
 
 
 /* =========================
-   START SERVER
+   START
 ========================= */
 
 app.listen(
