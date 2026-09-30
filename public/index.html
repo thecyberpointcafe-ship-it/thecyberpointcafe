@@ -1,13 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
 
-<meta name="google-site-verification" content="t4r2bEtLrgrWZTG7sAva4zlqm3hUoJzfeddefrIEYLQ" />
+<meta name="google-site-verification" content="t4r2bEtLrgrWZTG7sAva4zlqm3hUoJzfeddefrIEYLQ">
 
 <title>Shad Sheikh Digital | Online Document & Digital Services</title>
 
 <meta name="description" content="Shad Sheikh Digital - Online document upload, printing and digital services. Upload your documents easily and securely.">
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -97,17 +101,17 @@ h1{
   box-shadow:0 8px 30px #00000012;
 }
 
-label{
-  display:block;
-  margin:15px 0 7px;
-  font-weight:bold;
+.file-box{
+  margin-top:20px;
+  padding:25px 15px;
+  border:2px dashed #1264d8;
+  border-radius:15px;
+  text-align:center;
+  background:#f8fbff;
 }
 
-input{
+.file-box input{
   width:100%;
-  padding:13px;
-  border:1px solid #d0d5dd;
-  border-radius:10px;
   font-size:15px;
 }
 
@@ -132,10 +136,18 @@ input{
 }
 
 @media(max-width:600px){
-  h1{font-size:26px}
-  .buttons{grid-template-columns:1fr}
+
+  h1{
+    font-size:26px;
+  }
+
+  .buttons{
+    grid-template-columns:1fr;
+  }
+
 }
 </style>
+
 </head>
 
 <body>
@@ -144,9 +156,9 @@ input{
 
   <div class="header">
 
-   <div class="logo">
-  <img src="/Dppp.jpg" alt="Shad Sheikh">
-</div>
+    <div class="logo">
+      <img src="/Dppp.jpg" alt="Shad Sheikh">
+    </div>
 
     <h1>Shad Sheikh Digital</h1>
 
@@ -174,46 +186,32 @@ input{
 
   <div class="card" id="upload">
 
-    <h2>📄 Public Document Upload</h2>
+    <h2>📄 Document Upload</h2>
 
     <p>
-      Apna document upload karne ke liye neeche details bharen.
+      Apna document select karke Send button dabayein.
     </p>
 
     <form id="form">
 
-      <label>Name</label>
+      <div class="file-box">
 
-      <input
-        id="name"
-        type="text"
-        placeholder="Apna naam likhen"
-        required
-      >
+        <strong>📁 Document Select Karein</strong>
 
-      <label>Mobile ke last 4 digits</label>
+        <br><br>
 
-      <input
-        id="mobileLast4"
-        type="text"
-        maxlength="4"
-        inputmode="numeric"
-        placeholder="Example: 1234"
-        required
-      >
+        <input
+          id="files"
+          type="file"
+          multiple
+          accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
+          required
+        >
 
-      <label>Document select karein</label>
-
-      <input
-        id="files"
-        type="file"
-        multiple
-        accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx"
-        required
-      >
+      </div>
 
       <button class="btn upload" type="submit">
-        📤 Upload Document
+        📤 Send Document
       </button>
 
     </form>
@@ -229,57 +227,55 @@ input{
 </div>
 
 <script>
+
 const form = document.getElementById("form");
 const msg = document.getElementById("msg");
 
-form.addEventListener("submit", async function(e) {
+form.addEventListener("submit", async function(e){
+
   e.preventDefault();
 
-  const name = document.getElementById("name").value.trim();
-  const mobileLast4 = document.getElementById("mobileLast4").value.trim();
   const files = document.getElementById("files").files;
 
-  if (!/^\d{4}$/.test(mobileLast4)) {
-    msg.textContent = "❌ Mobile ke sirf last 4 digits daalein.";
-    return;
-  }
-
-  if (!files.length) {
+  if(!files.length){
     msg.textContent = "❌ Document select karein.";
     return;
   }
 
   const fd = new FormData();
 
-  fd.append("name", name);
-  fd.append("last4", mobileLast4);
-
-  for (const file of files) {
+  for(const file of files){
     fd.append("documents", file);
   }
 
-  msg.textContent = "⏳ Upload ho raha hai...";
+  msg.textContent = "⏳ Document send ho raha hai...";
 
-  try {
-    const r = await fetch("/api/upload", {
-      method: "POST",
-      body: fd
+  try{
+
+    const r = await fetch("/api/upload",{
+      method:"POST",
+      body:fd
     });
 
     const data = await r.json();
 
-    if (!r.ok) {
+    if(!r.ok){
       msg.textContent = "❌ " + (data.error || "Upload failed");
       return;
     }
 
-    msg.textContent = "✅ Document successfully upload ho gaya.";
+    msg.textContent = "✅ Document successfully send ho gaya.";
+
     form.reset();
 
-  } catch (error) {
+  }catch(error){
+
     msg.textContent = "❌ Server se connection nahi ho paaya.";
+
   }
+
 });
+
 </script>
 
 </body>
