@@ -1,17 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
-
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Shad Sheikh Admin</title>
 
 <style>
-
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -52,8 +48,7 @@ input{
   font-size:15px;
 }
 
-button,
-a{
+button,a{
   padding:12px 16px;
   border:0;
   border-radius:10px;
@@ -82,14 +77,13 @@ button{
 .open{
   background:#1264d8;
   color:white;
-  display:inline-block;
-  margin-top:8px;
+  margin:5px 5px 5px 0;
 }
 
 .copy{
   background:#168a45;
   color:white;
-  margin-top:8px;
+  margin:5px 5px 5px 0;
 }
 
 .status{
@@ -124,6 +118,7 @@ button{
   margin:12px 0;
   border-radius:10px;
   border:1px solid #ddd;
+  background:white;
 }
 
 .pdf-preview{
@@ -132,6 +127,12 @@ button{
   border:1px solid #ddd;
   border-radius:10px;
   margin-top:12px;
+}
+
+.loading{
+  padding:12px;
+  text-align:center;
+  color:#667085;
 }
 
 @media(max-width:600px){
@@ -149,11 +150,8 @@ button{
   .pdf-preview{
     height:500px;
   }
-
 }
-
 </style>
-
 </head>
 
 <body>
@@ -161,30 +159,29 @@ button{
 <div class="wrap">
 
 <a class="home" href="/">
-  ← Public Website
+← Public Website
 </a>
 
 <h1>🔐 Shad Sheikh Admin</h1>
 
 <div class="card">
 
-  <div class="login">
+<div class="login">
 
-    <input
-      id="key"
-      type="password"
-      placeholder="Admin password"
-    >
+<input
+id="key"
+type="password"
+placeholder="Admin password">
 
-    <button onclick="loadJobs()">
-      Login / Refresh
-    </button>
+<button onclick="loadJobs()">
+Login / Refresh
+</button>
 
-  </div>
+</div>
 
-  <div id="status" class="status">
-    Password enter karke Login karein.
-  </div>
+<div id="status" class="status">
+Password enter karke Login karein.
+</div>
 
 </div>
 
@@ -196,17 +193,20 @@ button{
 <script>
 
 const keyInput =
-  document.getElementById("key");
+document.getElementById("key");
 
 const statusBox =
-  document.getElementById("status");
+document.getElementById("status");
 
 const jobsBox =
-  document.getElementById("jobs");
+document.getElementById("jobs");
+
+const fileCache =
+new Map();
 
 
 keyInput.value =
-  localStorage.getItem("cafeAdminKey") || "";
+localStorage.getItem("cafeAdminKey") || "";
 
 
 /* =========================
@@ -215,221 +215,426 @@ keyInput.value =
 
 async function loadJobs(){
 
-  const key =
-    keyInput.value.trim();
+const key =
+keyInput.value.trim();
 
-  if(!key){
+if(!key){
 
-    statusBox.textContent =
-      "❌ Password enter karein.";
+statusBox.textContent =
+"❌ Password enter karein.";
 
-    return;
-  }
+return;
+}
 
-  localStorage.setItem(
-    "cafeAdminKey",
-    key
-  );
+localStorage.setItem(
+"cafeAdminKey",
+key
+);
 
-  statusBox.textContent =
-    "⏳ Loading...";
+statusBox.textContent =
+"⏳ Documents loading...";
 
-  try{
+try{
 
-    const response =
-      await fetch("/api/jobs",{
-        headers:{
-          "x-admin-key":key
-        }
-      });
+const response =
+await fetch("/api/jobs",{
+headers:{
+"x-admin-key":key
+}
+});
 
-    if(!response.ok){
+if(!response.ok){
 
-      statusBox.textContent =
-        "❌ Wrong admin password.";
+statusBox.textContent =
+"❌ Wrong admin password.";
 
-      jobsBox.innerHTML = "";
+jobsBox.innerHTML="";
 
-      return;
-    }
+return;
+}
 
-    const jobs =
-      await response.json();
+const jobs =
+await response.json();
 
-    statusBox.textContent =
-      "✅ Admin connected";
+statusBox.textContent =
+"✅ Admin connected";
 
-    jobsBox.innerHTML = "";
+jobsBox.innerHTML="";
 
 
-    if(!jobs.length){
+if(!jobs.length){
 
-      jobsBox.innerHTML =
-        '<div class="card">📭 अभी कोई document नहीं आया है.</div>';
+jobsBox.innerHTML=
+'<div class="card">📭 अभी कोई document नहीं आया है.</div>';
 
-      return;
-    }
+return;
+}
 
 
-    jobs.forEach(job => {
+jobs.forEach(job=>{
 
-      const card =
-        document.createElement("div");
+const card =
+document.createElement("div");
 
-      card.className = "card";
+card.className="card";
 
+const date =
+new Date(job.createdAt)
+.toLocaleString("en-IN");
 
-      const date =
-        new Date(job.createdAt)
-        .toLocaleString("en-IN");
+let filesHTML="";
 
 
-      let filesHTML = "";
+job.files.forEach(file=>{
 
+const ext =
+file.originalName
+.split(".")
+.pop()
+.toLowerCase();
 
-      job.files.forEach(file => {
+const isImage =
+["jpg","jpeg","png","webp"]
+.includes(ext);
 
-        const ext =
-          file.originalName
-          .split(".")
-          .pop()
-          .toLowerCase();
+const isPDF =
+ext==="pdf";
 
 
-        const isImage =
-          ["jpg","jpeg","png","webp"]
-          .includes(ext);
+let preview="";
 
 
-        const isPDF =
-          ext === "pdf";
+if(isImage){
 
+preview=`
 
-        const fileURL =
-          "/api/file/" + file.id;
+<div
+id="preview-${file.id}"
+class="loading">
 
+Image loading...
 
-        let preview = "";
+</div>
 
+`;
 
-        /* IMAGE */
+}
 
-        if(isImage){
 
-          preview = `
+if(isPDF){
 
-            <img
-              class="preview"
-              src="${fileURL}"
-              alt="Document"
-              loading="lazy"
-            >
+preview=`
 
-            <button
-              class="copy"
-              onclick="copyImage('${file.id}')"
-            >
-              📋 Copy Image
-            </button>
+<div
+id="preview-${file.id}"
+class="loading">
 
-          `;
+PDF loading...
 
-        }
+</div>
 
+`;
 
-        /* PDF */
+}
 
-        else if(isPDF){
 
-          preview = `
+if(!isImage && !isPDF){
 
-            <iframe
-              class="pdf-preview"
-              src="${fileURL}"
-            ></iframe>
+preview=`
 
-          `;
+<div class="small">
+📄 Word document
+</div>
 
-        }
+`;
 
+}
 
-        /* DOC / DOCX */
 
-        else{
+filesHTML +=`
 
-          preview = `
+<div class="file">
 
-            <p class="small">
-              📄 Word document
-            </p>
+<div class="file-name">
+📄 ${escapeHTML(file.originalName)}
+</div>
 
-          `;
+<div class="small">
+Size: ${formatBytes(file.size)}
+</div>
 
-        }
+${preview}
 
+<button
+class="open"
+onclick="openFile('${file.id}','${ext}')">
 
-        filesHTML += `
+👁️ Open
 
-          <div class="file">
+</button>
 
-            <div class="file-name">
-              📄 ${escapeHTML(file.originalName)}
-            </div>
+${isImage ? `
 
-            <div class="small">
-              Size: ${formatBytes(file.size)}
-            </div>
+<button
+class="copy"
+onclick="copyImage('${file.id}')">
 
-            ${preview}
+📋 Copy Image
 
-            <a
-              class="open"
-              href="${fileURL}"
-              target="_blank"
-            >
-              👁️ Open Document
-            </a>
+</button>
 
-          </div>
+` : ""}
 
-        `;
+</div>
 
-      });
+`;
 
+});
 
-      card.innerHTML = `
 
-        <h3>📄 New Document</h3>
+card.innerHTML=`
 
-        <div class="small">
-          Uploaded: ${date}
-        </div>
+<h3>📄 New Document</h3>
 
-        <hr>
+<div class="small">
+Uploaded: ${date}
+</div>
 
-        ${filesHTML}
+<hr>
 
-        <button
-          class="delete"
-          onclick="deleteJob('${job.id}')"
-        >
-          🗑️ Delete
-        </button>
+${filesHTML}
 
-      `;
+<button
+class="delete"
+onclick="deleteJob('${job.id}')">
 
+🗑️ Delete
 
-      jobsBox.appendChild(card);
+</button>
 
-    });
+`;
 
+jobsBox.appendChild(card);
 
-  }catch(error){
 
-    statusBox.textContent =
-      "❌ Server connection error.";
+/* LOAD IMAGE/PDF PREVIEWS */
 
-  }
+job.files.forEach(file=>{
+
+const ext =
+file.originalName
+.split(".")
+.pop()
+.toLowerCase();
+
+if(
+["jpg","jpeg","png","webp","pdf"]
+.includes(ext)
+){
+
+loadPreview(
+file.id,
+ext
+);
+
+}
+
+});
+
+});
+
+}catch(error){
+
+statusBox.textContent =
+"❌ Server connection error.";
+
+}
+
+}
+
+
+/* =========================
+   LOAD FILE ONCE
+========================= */
+
+async function getFile(id){
+
+if(fileCache.has(id)){
+
+return fileCache.get(id);
+
+}
+
+const key =
+keyInput.value.trim();
+
+const response =
+await fetch(
+"/api/file/"+id,
+{
+headers:{
+"x-admin-key":key
+}
+}
+);
+
+if(!response.ok){
+
+throw new Error(
+"File load failed"
+);
+
+}
+
+const blob =
+await response.blob();
+
+const url =
+URL.createObjectURL(blob);
+
+const data={
+blob:blob,
+url:url
+};
+
+fileCache.set(
+id,
+data
+);
+
+return data;
+
+}
+
+
+/* =========================
+   PREVIEW
+========================= */
+
+async function loadPreview(id,ext){
+
+try{
+
+const data =
+await getFile(id);
+
+const box =
+document.getElementById(
+"preview-"+id
+);
+
+if(!box) return;
+
+
+if(
+["jpg","jpeg","png","webp"]
+.includes(ext)
+){
+
+const img =
+document.createElement("img");
+
+img.className="preview";
+
+img.src =
+data.url;
+
+img.alt =
+"Document Preview";
+
+box.replaceWith(img);
+
+}
+
+
+if(ext==="pdf"){
+
+const iframe =
+document.createElement("iframe");
+
+iframe.className=
+"pdf-preview";
+
+iframe.src =
+data.url;
+
+box.replaceWith(iframe);
+
+}
+
+}catch(error){
+
+const box =
+document.getElementById(
+"preview-"+id
+);
+
+if(box){
+
+box.textContent =
+"❌ Document load नहीं हुआ.";
+
+}
+
+}
+
+}
+
+
+/* =========================
+   OPEN FILE
+========================= */
+
+async function openFile(id,ext){
+
+try{
+
+const data =
+await getFile(id);
+
+
+/* IMAGE / PDF */
+
+if(
+["jpg","jpeg","png","webp","pdf"]
+.includes(ext)
+){
+
+window.open(
+data.url,
+"_blank"
+);
+
+return;
+
+}
+
+
+/* DOC / DOCX */
+
+const a =
+document.createElement("a");
+
+a.href =
+data.url;
+
+a.download="";
+
+a.target="_blank";
+
+document.body.appendChild(a);
+
+a.click();
+
+a.remove();
+
+}catch(error){
+
+alert(
+"❌ Document open नहीं हुआ."
+);
+
+}
 
 }
 
@@ -440,62 +645,58 @@ async function loadJobs(){
 
 async function copyImage(id){
 
-  const key =
-    keyInput.value.trim();
+try{
+
+const data =
+await getFile(id);
+
+const blob =
+data.blob;
 
 
-  try{
+if(!blob.type.startsWith("image/")){
 
-    const response =
-      await fetch(
-        "/api/file/" + id,
-        {
-          headers:{
-            "x-admin-key":key
-          }
-        }
-      );
+alert(
+"❌ यह image file नहीं है."
+);
+
+return;
+}
 
 
-    if(!response.ok){
+if(
+!navigator.clipboard ||
+!window.ClipboardItem
+){
 
-      alert("❌ Image open नहीं हुई.");
+alert(
+"❌ Browser Copy Image support नहीं करता."
+);
 
-      return;
-    }
-
-
-    const blob =
-      await response.blob();
-
-
-    if(!blob.type.startsWith("image/")){
-
-      alert("❌ यह image नहीं है.");
-
-      return;
-    }
+return;
+}
 
 
-    await navigator.clipboard.write([
-      new ClipboardItem({
-        [blob.type]:blob
-      })
-    ]);
+await navigator.clipboard.write([
+
+new ClipboardItem({
+[blob.type]:blob
+})
+
+]);
 
 
-    alert(
-      "✅ Image copied! Photoshop में Ctrl + V करें."
-    );
+alert(
+"✅ Image copied! Photoshop में Ctrl + V करें."
+);
 
+}catch(error){
 
-  }catch(error){
+alert(
+"❌ Image copy नहीं हो पाई."
+);
 
-    alert(
-      "❌ Copy नहीं हो पाई. पहले image को Open करके try करें."
-    );
-
-  }
+}
 
 }
 
@@ -506,51 +707,62 @@ async function copyImage(id){
 
 async function deleteJob(id){
 
-  if(
-    !confirm(
-      "क्या यह पूरा document delete करना है?"
-    )
-  ){
+if(
+!confirm(
+"क्या यह पूरा document delete करना है?"
+)
+){
 
-    return;
-  }
+return;
+}
 
+const key =
+keyInput.value.trim();
 
-  const key =
-    keyInput.value.trim();
+try{
 
+const response =
+await fetch(
+"/api/job/"+id,
+{
+method:"DELETE",
+headers:{
+"x-admin-key":key
+}
+}
+);
 
-  try{
+if(!response.ok){
 
-    const response =
-      await fetch(
-        "/api/job/" + id,
-        {
-          method:"DELETE",
+alert(
+"❌ Delete नहीं हुआ."
+);
 
-          headers:{
-            "x-admin-key":key
-          }
-        }
-      );
-
-
-    if(!response.ok){
-
-      alert("❌ Delete नहीं हुआ.");
-
-      return;
-    }
+return;
+}
 
 
-    loadJobs();
+/* CLEAR CACHE */
 
+fileCache.forEach(
+item=>{
+URL.revokeObjectURL(
+item.url
+);
+}
+);
 
-  }catch(error){
+fileCache.clear();
 
-    alert("❌ Delete error.");
+loadJobs();
 
-  }
+}catch(error){
+
+alert(
+"❌ Delete error."
+);
+
+}
 
 }
 
@@ -561,33 +773,33 @@ async function deleteJob(id){
 
 function formatBytes(bytes){
 
-  if(!bytes){
-    return "0 Bytes";
-  }
+if(!bytes){
+return "0 Bytes";
+}
 
-  const units = [
-    "Bytes",
-    "KB",
-    "MB",
-    "GB"
-  ];
+const units=[
+"Bytes",
+"KB",
+"MB",
+"GB"
+];
 
-  const i =
-    Math.floor(
-      Math.log(bytes) /
-      Math.log(1024)
-    );
+const i=
+Math.floor(
+Math.log(bytes)/
+Math.log(1024)
+);
 
-  return (
-    parseFloat(
-      (
-        bytes /
-        Math.pow(1024,i)
-      ).toFixed(2)
-    )
-    + " "
-    + units[i]
-  );
+return(
+parseFloat(
+(
+bytes/
+Math.pow(1024,i)
+).toFixed(2)
+)
++" "+
+units[i]
+);
 
 }
 
@@ -598,12 +810,12 @@ function formatBytes(bytes){
 
 function escapeHTML(value){
 
-  return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+return String(value)
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
 
 }
 
