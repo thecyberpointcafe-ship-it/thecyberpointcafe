@@ -1,13 +1,17 @@
 <!doctype html>
 <html lang="hi">
 <head>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Shad Sheikh Admin</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -50,7 +54,8 @@ input{
   font-size:15px;
 }
 
-button,a{
+button,
+a{
   padding:12px 16px;
   border:0;
   border-radius:10px;
@@ -74,12 +79,19 @@ button{
 .delete{
   background:#d33;
   color:white;
+  margin-top:15px;
 }
 
-.download{
+.open{
   background:#1264d8;
   color:white;
   display:inline-block;
+  margin:5px 5px 5px 0;
+}
+
+.copy{
+  background:#168a45;
+  color:white;
   margin:5px 5px 5px 0;
 }
 
@@ -90,17 +102,45 @@ button{
 
 .file{
   background:#f5f7fa;
-  padding:12px;
-  border-radius:10px;
-  margin:8px 0;
+  padding:15px;
+  border-radius:12px;
+  margin:10px 0;
 }
 
 .small{
   color:#667085;
   font-size:14px;
+  margin:5px 0;
+}
+
+.preview{
+  width:100%;
+  max-width:500px;
+  max-height:500px;
+  object-fit:contain;
+  display:block;
+  margin:12px 0;
+  border-radius:10px;
+  background:#fff;
+  border:1px solid #ddd;
+}
+
+.pdf-preview{
+  width:100%;
+  height:600px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  margin-top:12px;
+  background:white;
+}
+
+.file-name{
+  font-weight:bold;
+  word-break:break-word;
 }
 
 @media(max-width:600px){
+
   .login{
     display:block;
   }
@@ -110,15 +150,24 @@ button{
     width:100%;
     margin-bottom:10px;
   }
+
+  .pdf-preview{
+    height:450px;
+  }
+
 }
+
 </style>
+
 </head>
 
 <body>
 
 <div class="wrap">
 
-<a class="home" href="/">← Public Website</a>
+<a class="home" href="/">
+  ← Public Website
+</a>
 
 <h1>🔐 Shad Sheikh Admin</h1>
 
@@ -148,34 +197,59 @@ button{
 
 </div>
 
+
 <script>
 
-const keyInput = document.getElementById("key");
-const statusBox = document.getElementById("status");
-const jobsBox = document.getElementById("jobs");
+const keyInput =
+  document.getElementById("key");
 
-keyInput.value = localStorage.getItem("cafeAdminKey") || "";
+const statusBox =
+  document.getElementById("status");
+
+const jobsBox =
+  document.getElementById("jobs");
+
+
+keyInput.value =
+  localStorage.getItem("cafeAdminKey") || "";
+
+
+/* =========================
+   LOAD DOCUMENTS
+========================= */
 
 async function loadJobs(){
 
-  const key = keyInput.value.trim();
+  const key =
+    keyInput.value.trim();
 
   if(!key){
-    statusBox.textContent = "❌ Password enter karein.";
+
+    statusBox.textContent =
+      "❌ Password enter karein.";
+
     return;
   }
 
-  localStorage.setItem("cafeAdminKey", key);
+  localStorage.setItem(
+    "cafeAdminKey",
+    key
+  );
 
-  statusBox.textContent = "⏳ Loading...";
+  statusBox.textContent =
+    "⏳ Documents loading...";
 
   try{
 
-    const response = await fetch("/api/jobs",{
-      headers:{
-        "x-admin-key":key
-      }
-    });
+    const response =
+      await fetch("/api/jobs",{
+
+        headers:{
+          "x-admin-key":key
+        }
+
+      });
+
 
     if(!response.ok){
 
@@ -187,57 +261,145 @@ async function loadJobs(){
       return;
     }
 
-    const jobs = await response.json();
+
+    const jobs =
+      await response.json();
+
 
     statusBox.textContent =
       "✅ Admin connected";
 
+
     jobsBox.innerHTML = "";
+
 
     if(!jobs.length){
 
       jobsBox.innerHTML =
-        '<div class="card">📭 अभी कोई uploaded document नहीं है.</div>';
+        '<div class="card">📭 अभी कोई document नहीं आया है.</div>';
 
       return;
     }
 
+
     jobs.forEach(job => {
 
-      const card = document.createElement("div");
-      card.className = "card";
+      const card =
+        document.createElement("div");
+
+      card.className =
+        "card";
+
 
       const date =
-        new Date(job.createdAt).toLocaleString("en-IN");
+        new Date(job.createdAt)
+        .toLocaleString("en-IN");
+
 
       let filesHTML = "";
 
+
       job.files.forEach(file => {
 
-        filesHTML += `
-          <div class="file">
-            📄 ${escapeHTML(file.originalName)}
-            <br>
-            <a
-              class="download"
-              href="/api/file/${file.id}"
-              target="_blank"
-              onclick="downloadFile(event,'${file.id}')"
+        const ext =
+          file.originalName
+          .split(".")
+          .pop()
+          .toLowerCase();
+
+
+        const isImage =
+          ["jpg","jpeg","png","webp"]
+          .includes(ext);
+
+
+        const isPDF =
+          ext === "pdf";
+
+
+        const fileURL =
+          "/api/file/" + file.id;
+
+
+        let previewHTML = "";
+
+
+        /* IMAGE PREVIEW */
+
+        if(isImage){
+
+          previewHTML = `
+
+            <img
+              class="preview"
+              src="${fileURL}"
+              data-file-id="${file.id}"
+              alt="Document Preview"
+              onerror="this.style.display='none'"
             >
-              ⬇️ Download
+
+            <button
+              class="copy"
+              onclick="copyImage('${file.id}')"
+            >
+              📋 Copy Image
+            </button>
+
+          `;
+
+        }
+
+
+        /* PDF PREVIEW */
+
+        if(isPDF){
+
+          previewHTML = `
+
+            <iframe
+              class="pdf-preview"
+              src="${fileURL}"
+            ></iframe>
+
+          `;
+
+        }
+
+
+        filesHTML += `
+
+          <div class="file">
+
+            <div class="file-name">
+              📄 ${escapeHTML(file.originalName)}
+            </div>
+
+            <div class="small">
+              Size: ${formatBytes(file.size)}
+            </div>
+
+            ${previewHTML}
+
+            <a
+              class="open"
+              href="${fileURL}"
+              target="_blank"
+            >
+              👁️ Open
             </a>
+
           </div>
+
         `;
 
       });
 
+
       card.innerHTML = `
 
-        <h3>👤 ${escapeHTML(job.name)}</h3>
-
-        <div class="small">
-          Mobile last 4 digits: ${escapeHTML(job.last4)}
-        </div>
+        <h3>
+          📄 New Document
+        </h3>
 
         <div class="small">
           Uploaded: ${date}
@@ -256,9 +418,11 @@ async function loadJobs(){
 
       `;
 
+
       jobsBox.appendChild(card);
 
     });
+
 
   }catch(error){
 
@@ -269,90 +433,224 @@ async function loadJobs(){
 
 }
 
-async function downloadFile(event,id){
 
-  event.preventDefault();
+/* =========================
+   COPY IMAGE
+========================= */
 
-  const key = keyInput.value.trim();
+async function copyImage(id){
+
+  const key =
+    keyInput.value.trim();
+
 
   try{
 
-    const response = await fetch("/api/file/"+id,{
-      headers:{
-        "x-admin-key":key
-      }
-    });
+    const response =
+      await fetch(
+        "/api/file/" + id,
+        {
+          headers:{
+            "x-admin-key":key
+          }
+        }
+      );
+
 
     if(!response.ok){
-      alert("File download नहीं हो पाया.");
+
+      alert(
+        "❌ Image load नहीं हो पाई."
+      );
+
       return;
     }
 
-    const blob = await response.blob();
 
-    const url = URL.createObjectURL(blob);
+    const blob =
+      await response.blob();
 
-    const a = document.createElement("a");
 
-    a.href = url;
-    a.download = "";
+    if(!blob.type.startsWith("image/")){
 
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+      alert(
+        "❌ यह image file नहीं है."
+      );
 
-    URL.revokeObjectURL(url);
+      return;
+    }
+
+
+    if(
+      !navigator.clipboard ||
+      !window.ClipboardItem
+    ){
+
+      alert(
+        "❌ Browser में Copy Image support नहीं है."
+      );
+
+      return;
+    }
+
+
+    const item =
+      new ClipboardItem({
+        [blob.type]: blob
+      });
+
+
+    await navigator.clipboard.write([
+      item
+    ]);
+
+
+    alert(
+      "✅ Image copy हो गई! अब Photoshop में Ctrl + V करें."
+    );
+
 
   }catch(error){
 
-    alert("Download error.");
+    alert(
+      "❌ Image copy नहीं हो पाई."
+    );
 
   }
 
 }
+
+
+/* =========================
+   DELETE
+========================= */
 
 async function deleteJob(id){
 
-  if(!confirm("क्या यह पूरा document record delete करना है?")){
+  if(
+    !confirm(
+      "क्या यह पूरा document delete करना है?"
+    )
+  ){
+
     return;
   }
 
-  const key = keyInput.value.trim();
+
+  const key =
+    keyInput.value.trim();
+
 
   try{
 
-    const response = await fetch("/api/job/"+id,{
-      method:"DELETE",
-      headers:{
-        "x-admin-key":key
-      }
-    });
+    const response =
+      await fetch(
+        "/api/job/" + id,
+        {
+          method:"DELETE",
+
+          headers:{
+            "x-admin-key":key
+          }
+        }
+      );
+
 
     if(!response.ok){
 
-      alert("Delete नहीं हुआ.");
-      return;
+      alert(
+        "❌ Delete नहीं हुआ."
+      );
 
+      return;
     }
+
 
     loadJobs();
 
+
   }catch(error){
 
-    alert("Delete error.");
+    alert(
+      "❌ Delete error."
+    );
 
   }
 
 }
+
+
+/* =========================
+   FILE SIZE
+========================= */
+
+function formatBytes(bytes){
+
+  if(!bytes){
+    return "0 Bytes";
+  }
+
+
+  const units = [
+    "Bytes",
+    "KB",
+    "MB",
+    "GB"
+  ];
+
+
+  const i =
+    Math.floor(
+      Math.log(bytes) /
+      Math.log(1024)
+    );
+
+
+  return (
+    parseFloat(
+      (bytes /
+      Math.pow(1024,i))
+      .toFixed(2)
+    )
+    + " "
+    + units[i]
+  );
+
+}
+
+
+/* =========================
+   SECURITY
+========================= */
 
 function escapeHTML(value){
 
   return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
 
 }
 
