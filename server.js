@@ -7,107 +7,80 @@ const crypto = require("crypto");
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-
 const ADMIN_KEY =
   process.env.ADMIN_KEY || "change-this-admin-key";
 
-const UPLOAD_DIR =
-  path.join(__dirname, "uploads");
+const UPLOAD_DIR = path.join(__dirname, "uploads");
+const DATA_FILE = path.join(__dirname, "data.json");
 
-const DATA_FILE =
-  path.join(__dirname, "data.json");
-
-
-/* =========================
-   FOLDERS
-========================= */
-
-fs.mkdirSync(UPLOAD_DIR, {
-  recursive: true
-});
+fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 if (!fs.existsSync(DATA_FILE)) {
   fs.writeFileSync(DATA_FILE, "[]");
 }
 
 
-/* =========================
-   MULTER
-========================= */
+/* FILE UPLOAD */
 
-const storage =
-  multer.diskStorage({
+const storage = multer.diskStorage({
 
-    destination: (_, __, cb) => {
-      cb(null, UPLOAD_DIR);
-    },
+  destination: (_, __, cb) => {
+    cb(null, UPLOAD_DIR);
+  },
 
-    filename: (_, file, cb) => {
+  filename: (_, file, cb) => {
 
-      const ext =
-        path.extname(
-          file.originalname
-        ).toLowerCase();
+    const ext =
+      path.extname(file.originalname).toLowerCase();
 
-      cb(
-        null,
-        crypto.randomUUID() + ext
-      );
+    cb(
+      null,
+      crypto.randomUUID() + ext
+    );
 
+  }
+
+});
+
+
+const upload = multer({
+
+  storage,
+
+  limits: {
+    fileSize: 20 * 1024 * 1024,
+    files: 10
+  },
+
+  fileFilter: (_, file, cb) => {
+
+    const allowed = [
+      ".pdf",
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".webp",
+      ".doc",
+      ".docx"
+    ];
+
+    const ext =
+      path.extname(file.originalname).toLowerCase();
+
+    if (allowed.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error("This file type is not allowed."));
     }
 
-  });
+  }
+
+});
 
 
-const upload =
-  multer({
+/* MIDDLEWARE */
 
-    storage,
-
-    limits: {
-      fileSize: 20 * 1024 * 1024,
-      files: 10
-    },
-
-    fileFilter: (_, file, cb) => {
-
-      const allowed = [
-        ".pdf",
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".webp",
-        ".doc",
-        ".docx"
-      ];
-
-      const ext =
-        path.extname(
-          file.originalname
-        ).toLowerCase();
-
-      if (allowed.includes(ext)) {
-        cb(null, true);
-      } else {
-        cb(
-          new Error(
-            "This file type is not allowed."
-          )
-        );
-      }
-
-    }
-
-  });
-
-
-/* =========================
-   MIDDLEWARE
-========================= */
-
-app.use(
-  express.json()
-);
+app.use(express.json());
 
 app.use(
   express.urlencoded({
@@ -117,17 +90,15 @@ app.use(
 
 app.use(
   express.static(
-    path.join(
-      __dirname,
-      "public"
-    )
+    path.join(__dirname, "public"),
+    {
+      maxAge: "1h"
+    }
   )
 );
 
 
-/* =========================
-   DATA
-========================= */
+/* DATA */
 
 function readData() {
 
@@ -163,15 +134,9 @@ function writeData(items) {
 }
 
 
-/* =========================
-   ADMIN SECURITY
-========================= */
+/* ADMIN SECURITY */
 
-function admin(
-  req,
-  res,
-  next
-) {
+function admin(req, res, next) {
 
   const key =
     req.headers["x-admin-key"] ||
@@ -180,11 +145,9 @@ function admin(
 
   if (key !== ADMIN_KEY) {
 
-    return res
-      .status(401)
-      .json({
-        error: "Unauthorized"
-      });
+    return res.status(401).json({
+      error: "Unauthorized"
+    });
 
   }
 
@@ -193,9 +156,7 @@ function admin(
 }
 
 
-/* =========================
-   CUSTOMER UPLOAD
-========================= */
+/* CUSTOMER UPLOAD */
 
 app.post(
   "/api/upload",
@@ -212,23 +173,17 @@ app.post(
       !req.files.length
     ) {
 
-      return res
-        .status(400)
-        .json({
-          error:
-            "At least one document is required."
-        });
+      return res.status(400).json({
+        error:
+          "At least one document is required."
+      });
 
     }
 
-
-    const items =
-      readData();
-
+    const items = readData();
 
     const batchId =
       crypto.randomUUID();
-
 
     const batch = {
 
@@ -238,31 +193,27 @@ app.post(
         new Date().toISOString(),
 
       files:
-        req.files.map(
-          file => ({
+        req.files.map(file => ({
 
-            id:
-              crypto.randomUUID(),
+          id:
+            crypto.randomUUID(),
 
-            originalName:
-              file.originalname,
+          originalName:
+            file.originalname,
 
-            storedName:
-              file.filename,
+          storedName:
+            file.filename,
 
-            size:
-              file.size
+          size:
+            file.size
 
-          })
-        )
+        }))
 
     };
-
 
     items.unshift(batch);
 
     writeData(items);
-
 
     res.json({
 
@@ -279,9 +230,7 @@ app.post(
 );
 
 
-/* =========================
-   ADMIN JOBS
-========================= */
+/* ADMIN DOCUMENT LIST */
 
 app.get(
   "/api/jobs",
@@ -296,35 +245,26 @@ app.get(
 );
 
 
-/* =========================
-   FILE OPEN / PREVIEW
-========================= */
+/* FILE OPEN / PREVIEW */
 
 app.get(
   "/api/file/:id",
   admin,
   (req, res) => {
 
-    const jobs =
-      readData();
+    const jobs = readData();
 
-
-    for (
-      const job of jobs
-    ) {
+    for (const job of jobs) {
 
       const file =
         job.files.find(
           item =>
-            item.id ===
-            req.params.id
+            item.id === req.params.id
         );
-
 
       if (!file) {
         continue;
       }
-
 
       const filePath =
         path.join(
@@ -332,27 +272,18 @@ app.get(
           file.storedName
         );
 
-
-      if (
-        !fs.existsSync(
-          filePath
-        )
-      ) {
+      if (!fs.existsSync(filePath)) {
 
         return res
           .status(404)
-          .send(
-            "File not found"
-          );
+          .send("File not found");
 
       }
-
 
       const ext =
         path.extname(
           file.originalName
         ).toLowerCase();
-
 
       const mimeTypes = {
 
@@ -379,17 +310,14 @@ app.get(
 
       };
 
-
       const contentType =
         mimeTypes[ext] ||
         "application/octet-stream";
-
 
       res.setHeader(
         "Content-Type",
         contentType
       );
-
 
       res.setHeader(
         "Content-Disposition",
@@ -398,12 +326,15 @@ app.get(
         )}"`
       );
 
-
       res.setHeader(
         "Cache-Control",
         "private, max-age=3600"
       );
 
+      res.setHeader(
+        "X-Content-Type-Options",
+        "nosniff"
+      );
 
       return res.sendFile(
         filePath
@@ -411,52 +342,38 @@ app.get(
 
     }
 
-
     res
       .status(404)
-      .send(
-        "File not found"
-      );
+      .send("File not found");
 
   }
 );
 
 
-/* =========================
-   DELETE
-========================= */
+/* DELETE DOCUMENT */
 
 app.delete(
   "/api/job/:id",
   admin,
   (req, res) => {
 
-    const jobs =
-      readData();
-
+    const jobs = readData();
 
     const job =
       jobs.find(
         item =>
-          item.id ===
-          req.params.id
+          item.id === req.params.id
       );
-
 
     if (!job) {
 
-      return res
-        .status(404)
-        .json({
-          error: "Not found"
-        });
+      return res.status(404).json({
+        error: "Not found"
+      });
 
     }
 
-
-    for (
-      const file of job.files
-    ) {
+    for (const file of job.files) {
 
       const filePath =
         path.join(
@@ -464,30 +381,20 @@ app.delete(
           file.storedName
         );
 
+      if (fs.existsSync(filePath)) {
 
-      if (
-        fs.existsSync(
-          filePath
-        )
-      ) {
-
-        fs.unlinkSync(
-          filePath
-        );
+        fs.unlinkSync(filePath);
 
       }
 
     }
 
-
     writeData(
       jobs.filter(
         item =>
-          item.id !==
-          req.params.id
+          item.id !== req.params.id
       )
     );
-
 
     res.json({
       ok: true
@@ -497,9 +404,7 @@ app.delete(
 );
 
 
-/* =========================
-   HEALTH
-========================= */
+/* HEALTH */
 
 app.get(
   "/api/health",
@@ -513,46 +418,34 @@ app.get(
 );
 
 
-/* =========================
-   ERROR
-========================= */
+/* ERROR */
 
 app.use(
   (err, req, res, next) => {
 
     console.error(err);
 
-
     if (
-      err instanceof
-      multer.MulterError
+      err instanceof multer.MulterError
     ) {
 
-      return res
-        .status(400)
-        .json({
-          error:
-            err.message
-        });
+      return res.status(400).json({
+        error: err.message
+      });
 
     }
 
-
-    res
-      .status(400)
-      .json({
-        error:
-          err.message ||
-          "Upload failed"
-      });
+    res.status(400).json({
+      error:
+        err.message ||
+        "Upload failed"
+    });
 
   }
 );
 
 
-/* =========================
-   START
-========================= */
+/* START SERVER */
 
 app.listen(
   PORT,
