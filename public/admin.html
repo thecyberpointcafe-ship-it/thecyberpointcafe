@@ -23,12 +23,12 @@ body{
 .wrap{
   max-width:1000px;
   margin:auto;
-  padding:25px 15px 40px;
+  padding:20px 15px 40px;
 }
 
 h1{
   text-align:center;
-  margin-bottom:25px;
+  margin:15px 0 25px;
 }
 
 .card{
@@ -42,12 +42,10 @@ h1{
 .login{
   display:flex;
   gap:10px;
-  flex-wrap:wrap;
 }
 
 input{
   flex:1;
-  min-width:220px;
   padding:13px;
   border:1px solid #ccd3df;
   border-radius:10px;
@@ -73,7 +71,6 @@ button{
   display:inline-block;
   background:#172033;
   color:white;
-  margin-bottom:15px;
 }
 
 .delete{
@@ -86,13 +83,13 @@ button{
   background:#1264d8;
   color:white;
   display:inline-block;
-  margin:5px 5px 5px 0;
+  margin-top:8px;
 }
 
 .copy{
   background:#168a45;
   color:white;
-  margin:5px 5px 5px 0;
+  margin-top:8px;
 }
 
 .status{
@@ -107,10 +104,15 @@ button{
   margin:10px 0;
 }
 
+.file-name{
+  font-weight:bold;
+  word-break:break-word;
+}
+
 .small{
   color:#667085;
   font-size:14px;
-  margin:5px 0;
+  margin-top:5px;
 }
 
 .preview{
@@ -121,7 +123,6 @@ button{
   display:block;
   margin:12px 0;
   border-radius:10px;
-  background:#fff;
   border:1px solid #ddd;
 }
 
@@ -131,12 +132,6 @@ button{
   border:1px solid #ddd;
   border-radius:10px;
   margin-top:12px;
-  background:white;
-}
-
-.file-name{
-  font-weight:bold;
-  word-break:break-word;
 }
 
 @media(max-width:600px){
@@ -152,7 +147,7 @@ button{
   }
 
   .pdf-preview{
-    height:450px;
+    height:500px;
   }
 
 }
@@ -237,19 +232,16 @@ async function loadJobs(){
   );
 
   statusBox.textContent =
-    "⏳ Documents loading...";
+    "⏳ Loading...";
 
   try{
 
     const response =
       await fetch("/api/jobs",{
-
         headers:{
           "x-admin-key":key
         }
-
       });
-
 
     if(!response.ok){
 
@@ -261,14 +253,11 @@ async function loadJobs(){
       return;
     }
 
-
     const jobs =
       await response.json();
 
-
     statusBox.textContent =
       "✅ Admin connected";
-
 
     jobsBox.innerHTML = "";
 
@@ -287,8 +276,7 @@ async function loadJobs(){
       const card =
         document.createElement("div");
 
-      card.className =
-        "card";
+      card.className = "card";
 
 
       const date =
@@ -321,21 +309,20 @@ async function loadJobs(){
           "/api/file/" + file.id;
 
 
-        let previewHTML = "";
+        let preview = "";
 
 
-        /* IMAGE PREVIEW */
+        /* IMAGE */
 
         if(isImage){
 
-          previewHTML = `
+          preview = `
 
             <img
               class="preview"
               src="${fileURL}"
-              data-file-id="${file.id}"
-              alt="Document Preview"
-              onerror="this.style.display='none'"
+              alt="Document"
+              loading="lazy"
             >
 
             <button
@@ -350,16 +337,31 @@ async function loadJobs(){
         }
 
 
-        /* PDF PREVIEW */
+        /* PDF */
 
-        if(isPDF){
+        else if(isPDF){
 
-          previewHTML = `
+          preview = `
 
             <iframe
               class="pdf-preview"
               src="${fileURL}"
             ></iframe>
+
+          `;
+
+        }
+
+
+        /* DOC / DOCX */
+
+        else{
+
+          preview = `
+
+            <p class="small">
+              📄 Word document
+            </p>
 
           `;
 
@@ -378,14 +380,14 @@ async function loadJobs(){
               Size: ${formatBytes(file.size)}
             </div>
 
-            ${previewHTML}
+            ${preview}
 
             <a
               class="open"
               href="${fileURL}"
               target="_blank"
             >
-              👁️ Open
+              👁️ Open Document
             </a>
 
           </div>
@@ -397,9 +399,7 @@ async function loadJobs(){
 
       card.innerHTML = `
 
-        <h3>
-          📄 New Document
-        </h3>
+        <h3>📄 New Document</h3>
 
         <div class="small">
           Uploaded: ${date}
@@ -459,9 +459,7 @@ async function copyImage(id){
 
     if(!response.ok){
 
-      alert(
-        "❌ Image load नहीं हो पाई."
-      );
+      alert("❌ Image open नहीं हुई.");
 
       return;
     }
@@ -473,47 +471,28 @@ async function copyImage(id){
 
     if(!blob.type.startsWith("image/")){
 
-      alert(
-        "❌ यह image file नहीं है."
-      );
+      alert("❌ यह image नहीं है.");
 
       return;
     }
-
-
-    if(
-      !navigator.clipboard ||
-      !window.ClipboardItem
-    ){
-
-      alert(
-        "❌ Browser में Copy Image support नहीं है."
-      );
-
-      return;
-    }
-
-
-    const item =
-      new ClipboardItem({
-        [blob.type]: blob
-      });
 
 
     await navigator.clipboard.write([
-      item
+      new ClipboardItem({
+        [blob.type]:blob
+      })
     ]);
 
 
     alert(
-      "✅ Image copy हो गई! अब Photoshop में Ctrl + V करें."
+      "✅ Image copied! Photoshop में Ctrl + V करें."
     );
 
 
   }catch(error){
 
     alert(
-      "❌ Image copy नहीं हो पाई."
+      "❌ Copy नहीं हो पाई. पहले image को Open करके try करें."
     );
 
   }
@@ -558,9 +537,7 @@ async function deleteJob(id){
 
     if(!response.ok){
 
-      alert(
-        "❌ Delete नहीं हुआ."
-      );
+      alert("❌ Delete नहीं हुआ.");
 
       return;
     }
@@ -571,9 +548,7 @@ async function deleteJob(id){
 
   }catch(error){
 
-    alert(
-      "❌ Delete error."
-    );
+    alert("❌ Delete error.");
 
   }
 
@@ -590,7 +565,6 @@ function formatBytes(bytes){
     return "0 Bytes";
   }
 
-
   const units = [
     "Bytes",
     "KB",
@@ -598,19 +572,18 @@ function formatBytes(bytes){
     "GB"
   ];
 
-
   const i =
     Math.floor(
       Math.log(bytes) /
       Math.log(1024)
     );
 
-
   return (
     parseFloat(
-      (bytes /
-      Math.pow(1024,i))
-      .toFixed(2)
+      (
+        bytes /
+        Math.pow(1024,i)
+      ).toFixed(2)
     )
     + " "
     + units[i]
@@ -626,31 +599,11 @@ function formatBytes(bytes){
 function escapeHTML(value){
 
   return String(value)
-
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
 }
 
