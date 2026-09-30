@@ -5,11 +5,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<meta name="google-site-verification" content="t4r2bEtLrgrWZTG7sAva4zlqm3hUoJzfeddefrIEYLQ">
+<meta name="google-site-verification"
+content="t4r2bEtLrgrWZTG7sAva4zlqm3hUoJzfeddefrIEYLQ">
 
 <title>Shad Sheikh Digital | Online Document Services</title>
 
-<meta name="description" content="Shad Sheikh Digital - Easy online document upload and digital services.">
+<meta name="description"
+content="Shad Sheikh Digital - Easy online document upload and digital services.">
 
 <style>
 
@@ -27,12 +29,12 @@ body{
 .wrap{
   max-width:650px;
   margin:auto;
-  padding:18px 14px 35px;
+  padding:12px 12px 30px;
 }
 
 .header{
   text-align:center;
-  padding:15px 5px 20px;
+  padding:12px 5px 18px;
 }
 
 .logo{
@@ -51,7 +53,7 @@ body{
 }
 
 h1{
-  margin:12px 0 5px;
+  margin:11px 0 5px;
   font-size:27px;
 }
 
@@ -69,14 +71,14 @@ h1{
 
 .buttons{
   display:flex;
-  gap:10px;
-  margin-top:18px;
+  gap:8px;
+  margin-top:17px;
 }
 
 .btn{
   flex:1;
   display:block;
-  padding:13px 10px;
+  padding:13px 8px;
   border:0;
   border-radius:10px;
   text-align:center;
@@ -99,12 +101,12 @@ h1{
 .card{
   background:white;
   border-radius:16px;
-  padding:20px;
+  padding:17px;
   box-shadow:0 5px 20px #0000000d;
 }
 
 .card h2{
-  margin:0 0 7px;
+  margin:0 0 6px;
   font-size:21px;
 }
 
@@ -117,19 +119,20 @@ h1{
 .file-box{
   display:block;
   width:100%;
-  margin-top:18px;
-  padding:25px 15px;
+  margin-top:17px;
+  padding:27px 10px;
   border:2px dashed #1264d8;
   border-radius:14px;
   text-align:center;
   background:#f8fbff;
   cursor:pointer;
-  transition:.15s;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
 }
 
 .file-box:active{
-  transform:scale(.99);
   background:#eef6ff;
+  transform:scale(.99);
 }
 
 .file-box strong{
@@ -158,58 +161,74 @@ h1{
 }
 
 .upload:disabled{
-  opacity:.6;
+  opacity:.65;
+  cursor:not-allowed;
+}
+
+.selected{
+  display:none;
+  margin-top:9px;
+  padding:9px;
+  border-radius:8px;
+  background:#f2f5f9;
+  color:#475467;
+  font-size:13px;
+  word-break:break-word;
+}
+
+.progress-wrap{
+  display:none;
+  margin-top:12px;
+}
+
+.progress{
+  width:100%;
+  height:8px;
+  background:#e5e7eb;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.progress-bar{
+  width:0%;
+  height:100%;
+  background:#1264d8;
+  transition:width .1s linear;
+}
+
+.progress-text{
+  text-align:center;
+  margin-top:6px;
+  font-size:13px;
+  color:#667085;
 }
 
 .note{
   text-align:center;
   color:#667085;
   font-size:12px;
-  margin-top:10px;
+  margin-top:9px;
 }
 
 #msg{
   text-align:center;
-  margin-top:13px;
+  margin-top:12px;
   font-weight:bold;
   font-size:14px;
 }
 
-#selected{
-  margin-top:10px;
-  padding:10px;
-  border-radius:9px;
-  background:#f2f5f9;
-  font-size:13px;
-  display:none;
-  word-break:break-word;
-}
-
 @media(max-width:600px){
-
-  .wrap{
-    padding:12px 12px 30px;
-  }
 
   h1{
     font-size:24px;
   }
 
-  .buttons{
-    gap:8px;
-  }
-
-  .btn{
-    font-size:13px;
-    padding:12px 7px;
-  }
-
   .card{
-    padding:16px;
+    padding:15px;
   }
 
   .file-box{
-    padding:28px 10px;
+    padding:28px 8px;
   }
 
 }
@@ -282,15 +301,41 @@ h1{
       </label>
 
 
-      <div id="selected"></div>
+      <div
+        id="selected"
+        class="selected">
+      </div>
+
+
+      <div
+        id="progressWrap"
+        class="progress-wrap">
+
+        <div class="progress">
+
+          <div
+            id="progressBar"
+            class="progress-bar">
+          </div>
+
+        </div>
+
+        <div
+          id="progressText"
+          class="progress-text">
+          0%
+        </div>
+
+      </div>
 
 
       <button
-        class="btn upload"
         id="sendBtn"
-        type="submit"
-      >
+        class="btn upload"
+        type="submit">
+
         📤 Send
+
       </button>
 
     </form>
@@ -319,146 +364,207 @@ const filesInput =
 const selected =
   document.getElementById("selected");
 
-const msg =
-  document.getElementById("msg");
-
 const sendBtn =
   document.getElementById("sendBtn");
 
+const msg =
+  document.getElementById("msg");
 
-/* FILE SELECT */
+const progressWrap =
+  document.getElementById("progressWrap");
 
-filesInput.addEventListener("change",function(){
+const progressBar =
+  document.getElementById("progressBar");
 
-  const files = this.files;
-
-  if(!files.length){
-
-    selected.style.display="none";
-    selected.textContent="";
-
-    return;
-  }
-
-  let text =
-    "📎 " +
-    files.length +
-    " document selected";
-
-  if(files.length === 1){
-
-    text =
-      "📎 " +
-      files[0].name;
-
-  }
-
-  selected.textContent = text;
-
-  selected.style.display="block";
-
-});
+const progressText =
+  document.getElementById("progressText");
 
 
-/* UPLOAD */
+/* =========================
+   FILE SELECT
+========================= */
 
-form.addEventListener("submit",function(e){
+filesInput.addEventListener(
+  "change",
+  function(){
 
-  e.preventDefault();
+    const files =
+      this.files;
 
-  const files =
-    filesInput.files;
+    if(!files.length){
 
-  if(!files.length){
+      selected.style.display =
+        "none";
 
-    msg.textContent =
-      "❌ Pehle document select karein.";
-
-    return;
-  }
-
-
-  /* SIZE CHECK */
-
-  for(const file of files){
-
-    if(
-      file.size >
-      20 * 1024 * 1024
-    ){
-
-      msg.textContent =
-        "❌ " +
-        file.name +
-        " 20 MB se bada hai.";
+      selected.textContent =
+        "";
 
       return;
     }
 
+
+    if(files.length === 1){
+
+      selected.textContent =
+        "📎 " + files[0].name;
+
+    }else{
+
+      selected.textContent =
+        "📎 " +
+        files.length +
+        " documents selected";
+
+    }
+
+
+    selected.style.display =
+      "block";
+
   }
+);
 
 
-  const fd =
-    new FormData();
+/* =========================
+   FAST UPLOAD
+========================= */
+
+form.addEventListener(
+  "submit",
+  function(e){
+
+    e.preventDefault();
 
 
-  for(const file of files){
-
-    fd.append(
-      "documents",
-      file
-    );
-
-  }
+    const files =
+      filesInput.files;
 
 
-  sendBtn.disabled=true;
+    if(!files.length){
 
-  msg.textContent =
-    "⏳ Document send ho raha hai...";
+      msg.textContent =
+        "❌ Pehle document select karein.";
 
-
-  const xhr =
-    new XMLHttpRequest();
-
-
-  xhr.open(
-    "POST",
-    "/api/upload"
-  );
+      return;
+    }
 
 
-  /* UPLOAD PROGRESS */
+    /* SIZE CHECK */
 
-  xhr.upload.onprogress =
-    function(e){
+    for(const file of files){
 
-      if(e.lengthComputable){
-
-        const percent =
-          Math.round(
-            (e.loaded / e.total) * 100
-          );
+      if(
+        file.size >
+        20 * 1024 * 1024
+      ){
 
         msg.textContent =
-          "⏳ Sending... " +
-          percent +
-          "%";
+          "❌ " +
+          file.name +
+          " 20 MB se bada hai.";
 
+        return;
       }
 
-    };
+    }
 
 
-  xhr.onload =
-    function(){
+    /* FORM DATA */
 
-      sendBtn.disabled=false;
+    const fd =
+      new FormData();
 
-      try{
 
-        const data =
-          JSON.parse(xhr.responseText);
+    for(
+      const file of files
+    ){
+
+      fd.append(
+        "documents",
+        file
+      );
+
+    }
+
+
+    /* UI */
+
+    sendBtn.disabled =
+      true;
+
+    progressWrap.style.display =
+      "block";
+
+    progressBar.style.width =
+      "0%";
+
+    progressText.textContent =
+      "0%";
+
+    msg.textContent =
+      "⏳ Document send ho raha hai...";
+
+
+    /* XHR */
+
+    const xhr =
+      new XMLHttpRequest();
+
+
+    xhr.open(
+      "POST",
+      "/api/upload",
+      true
+    );
+
+
+    /*
+      UPLOAD PROGRESS
+    */
+
+    xhr.upload.onprogress =
+      function(event){
+
+        if(
+          event.lengthComputable
+        ){
+
+          const percent =
+            Math.round(
+              (
+                event.loaded /
+                event.total
+              ) * 100
+            );
+
+
+          progressBar.style.width =
+            percent + "%";
+
+
+          progressText.textContent =
+            "Sending... " +
+            percent +
+            "%";
+
+        }
+
+      };
+
+
+    /*
+      SUCCESS
+    */
+
+    xhr.onload =
+      function(){
+
+        sendBtn.disabled =
+          false;
+
+
+        progressBar.style.width =
+          "100%";
 
 
         if(
@@ -469,47 +575,115 @@ form.addEventListener("submit",function(e){
           msg.textContent =
             "✅ Document successfully send ho gaya.";
 
+          progressText.textContent =
+            "100%";
+
+
           form.reset();
 
-          selected.style.display="none";
 
-          selected.textContent="";
+          selected.style.display =
+            "none";
+
+          selected.textContent =
+            "";
+
+
+          setTimeout(
+            function(){
+
+              progressWrap.style.display =
+                "none";
+
+              progressBar.style.width =
+                "0%";
+
+              progressText.textContent =
+                "0%";
+
+            },
+            1500
+          );
+
 
         }else{
 
+          let errorMessage =
+            "Upload failed";
+
+          try{
+
+            const data =
+              JSON.parse(
+                xhr.responseText
+              );
+
+            if(data.error){
+
+              errorMessage =
+                data.error;
+
+            }
+
+          }catch(error){}
+
+
           msg.textContent =
             "❌ " +
-            (
-              data.error ||
-              "Upload failed"
-            );
+            errorMessage;
+
+
+          progressText.textContent =
+            "Upload failed";
 
         }
 
-      }catch(error){
+      };
+
+
+    /*
+      CONNECTION ERROR
+    */
+
+    xhr.onerror =
+      function(){
+
+        sendBtn.disabled =
+          false;
 
         msg.textContent =
-          "❌ Upload failed.";
+          "❌ Server se connection nahi ho paaya.";
 
-      }
+        progressText.textContent =
+          "Connection error";
 
-    };
-
-
-  xhr.onerror =
-    function(){
-
-      sendBtn.disabled=false;
-
-      msg.textContent =
-        "❌ Server se connection nahi ho paaya.";
-
-    };
+      };
 
 
-  xhr.send(fd);
+    /*
+      CANCEL / TIMEOUT
+    */
 
-});
+    xhr.onabort =
+      function(){
+
+        sendBtn.disabled =
+          false;
+
+        msg.textContent =
+          "❌ Upload cancel ho gaya.";
+
+      };
+
+
+    /*
+      SEND
+    */
+
+    xhr.send(fd);
+
+  }
+);
 
 </script>
 
